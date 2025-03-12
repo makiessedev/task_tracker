@@ -18,45 +18,22 @@ class TaskTracker {
         $line = trim($line);
         readline_add_history($line);
         $commands = explode(" ", $line);
-
-        $isValidCommand = $this->validateCommand($commands);
-        if (!$isValidCommand)
-          echo "-- invalid command or arguments!\n";
-        else {
-          switch($commands[0]) {
-            case "add" :
-            case "update" :
-            case "delete" :
-            case "mark-in-progress" :
-            case "mark-done" :
-              break;
-            case "list":
-              if (!isset($commands[1]))
-                $this->printTaks();
-              else {
-                switch($commands[1]) {
-                  case "done" :
-                    $this->printTaks("done");
-                    break;
-                  case "todo" :
-                    $this->printTaks("not done");
-                    break;
-                  case "in-progress" :
-                    $this->printTaks("in progress");
-                    break;
-                  default:
-                    echo "Error on list tasks";
-                }
-              }
-              break;
-            case "exit":
-              echo "other\n";
-            default:
-              echo "Error on verify command";
-          }
-        }
+        $this->process_command($commands);
       }
     }
+  }
+
+  private function addTask($task) {
+    $tasks = $this->getAllTasks();
+    if (sizeof($tasks) === 0) {
+      $id = 0;
+    } else {
+      $id = (int) ($tasks["lastId"] + 1);
+    }
+    array_push($tasks["tasks"], ["id" => $id, "task" => $task, "status" => "not done"]);
+    $tasks["lastId"] = $id;
+    $content = json_encode($tasks, JSON_PRETTY_PRINT);
+    file_put_contents("db.json", $content);
   }
 
   private function getAllTasks() {
@@ -85,25 +62,110 @@ class TaskTracker {
     });
   }
 
-  private function validateCommand($command) {
-    $allCommands = $this->getCommands();
+  public function add_command($command) {
+    $i = 1;
+    $j = 0;
+    $k = 0;
+    $argument = $command[$i];
+    $task = "";
 
-    if ($command[0] == "list" && isset($command[1]) && sizeof($command) === 2) {
-      switch ($command[1]) {
-        case "done":
-        case "todo":
-        case "in-progress":
-          return (true);
-        default:
-          return (false);
+    if ($argument[$j] !== '"'){
+      echo "argument must be in quotes: add \"some argument\"\n";
+      return ;
+    } else {
+      $j++;
+      while (isset($argument[$j]) && $argument[$j] !== "\"")
+        $task[$k++] = $argument[$j++];
+
+      if (!isset($argument[$j])){
+        while (isset($command[++$i])) {
+          $j = 0;
+          $argument = $command[$i];
+          $task[$k++] = " ";
+
+          while (isset($argument[$j]) && $argument[$j] !== "\"")
+            $task[$k++] = $argument[$j++];
+        }
+      }
+      if (!isset($argument[$j]) || $argument[$j] !== "\""){
+        echo "Explect close quotes: add \"some argument\"\n";
+        return ;
       }
     }
 
-    foreach($allCommands as $commands) {
-      if ($commands["cmd"] === $command[0] && $commands["args_length"] === sizeof($command))
-        return (true);
+    $this->addTask($task);
+  }
+  public function update_command($command) {
+    echo "update command \n";
+  }
+  public function delete_command($command) {
+    echo "delete command \n";
+  }
+  public function markInProgress_command($command) {
+    echo "mark-in-progress command \n";
+  }
+  public function listDone_command($command) {
+    $this->printTaks("done");
+  }
+  public function listTodo_command($command) {
+    $this->printTaks("not done");
+  }
+  public function listInProgress_command($command) {
+    $this->printTaks("in progress");
+  }
+  public function list_command($command) {
+    $this->printTaks();
+  }
+  public function markDone_command($command) {
+    echo "mark done command \n";
+  }
+  public function exit_command($command) {
+    echo "exit command \n";
+  }
+
+  private function process_command($command) {
+    switch($command[0]) {
+      case "add" :
+        $this->add_command($command);
+        break;
+      case "update" :
+        $this->update_command($command);
+        break;
+      case "delete" :
+        $this->delete_command($command);
+        break;
+      case "mark-in-progress" :
+        $this->markInProgress_command($command);
+        break;
+      case "mark-done" :
+        $this->markDone_command($command);
+        break;
+      case "list":
+        if (isset($command[1])) {
+          switch($command[1]) {
+            case "done":
+              $this->listDone_command($command);
+              break;
+            case "todo":
+              $this->listTodo_command($command);
+              break;
+            case "in-progress":
+              $this->listInProgress_command($command);
+              break;
+            default:
+              echo "$command[1] is invalid argument\n";
+              return ;
+          }
+        } else {
+          $this->list_command($command);
+        }
+        break;
+      case "exit":
+        $this->exit_command($command);
+        break;
+      default:
+        echo "command '$command[0]' not found!\n";
     }
-    return (false);
   }
 
   private function getCommands() {
