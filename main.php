@@ -58,15 +58,14 @@ class TaskTracker {
     });
   }
 
-  public function add_command($command) {
-    $i = 1;
+  private function get_task($command, $start) {
     $j = 0;
     $k = 0;
-    $argument = $command[$i];
+    $argument = $command[$start];
     $task = "";
 
     if ($argument[$j] !== '"'){
-      echo "argument must be in quotes: add \"some argument\"\n";
+      echo "argument must be in quotes: command <id> \"some argument\"\n";
       return ;
     } else {
       $j++;
@@ -74,9 +73,9 @@ class TaskTracker {
         $task[$k++] = $argument[$j++];
 
       if (!isset($argument[$j])){
-        while (isset($command[++$i])) {
+        while (isset($command[++$start])) {
           $j = 0;
-          $argument = $command[$i];
+          $argument = $command[$start];
           $task[$k++] = " ";
 
           while (isset($argument[$j]) && $argument[$j] !== "\"")
@@ -84,15 +83,36 @@ class TaskTracker {
         }
       }
       if (!isset($argument[$j]) || $argument[$j] !== "\""){
-        echo "Explect close quotes: add \"some argument\"\n";
+        echo "Explect close quotes: command <id> \"some argument\"\n";
         return ;
       }
     }
+    return ($task);
+  }
+
+  public function add_command($command) {
+    $task = $this->get_task($command, 1);
 
     $this->addTask($task);
   }
   public function update_command($command) {
-    echo "update command \n";
+    if (!isset($command[1]) || !isset($command[2])) {
+      echo "Invalid sintaxe!\n";
+      return ;
+    }
+
+    $newValue = $this->get_task($command, 2);
+
+    $tasksRaw = $this->getAllTasks();
+    foreach($tasksRaw["tasks"] as &$task) {
+      if ($task["id"] == $command[1]) {
+        $task["task"] = $newValue;
+        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        return ;
+      }
+    }
+
+    echo "Success!\n";
   }
   public function delete_command($command) {
     if (!isset($command[1])) {
