@@ -93,7 +93,8 @@ class TaskTracker {
   public function add_command($command) {
     $task = $this->get_task($command, 1);
 
-    $this->addTask($task);
+    if (isset($task))
+      $this->addTask($task);
   }
   public function update_command($command) {
     if (!isset($command[1]) || !isset($command[2])) {
@@ -102,6 +103,9 @@ class TaskTracker {
     }
 
     $newValue = $this->get_task($command, 2);
+
+    if (!isset($newValue))
+      return ;
 
     $tasksRaw = $this->getAllTasks();
     foreach($tasksRaw["tasks"] as &$task) {
@@ -176,7 +180,6 @@ class TaskTracker {
       }
     }
 
-
     echo "task id not found\n";
   }
 
@@ -227,21 +230,6 @@ class TaskTracker {
       default:
         echo "command '$command[0]' not found!\n";
     }
-  }
-
-  private function getCommands() {
-    return [
-      ["cmd" => "add", "args_length" => 2],
-      ["cmd" => "update", "args_length" => 3],
-      ["cmd" => "delete", "args_length" => 2],
-      ["cmd" => "mark-in-progress", "args_length" => 2],
-      ["cmd" => "mark-done", "args_length" => 2],
-      ["cmd" => "list", "args_length" => 1],
-      ["cmd" => "list done", "args_length" => 2],
-      ["cmd" => "list todo", "args_length" => 2],
-      ["cmd" => "list in-progress", "args_length" => 2],
-      ["cmd" => "exit", "args_length" => 1],
-    ];
   }
 }
 

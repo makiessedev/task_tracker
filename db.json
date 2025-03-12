@@ -1,20 +1,4 @@
 {
-    "lastId": 5,
-    "tasks": [
-        {
-            "id": 2,
-            "task": "Correr",
-            "status": "done"
-        },
-        {
-            "id": 3,
-            "task": "Other Makiesse Morais",
-            "status": "in progress"
-        },
-        {
-            "id": 5,
-            "task": "Tomar Cafe",
-            "status": "not done"
-        }
-    ]
+    "lastId": 1,
+    "tasks": []
 }
