@@ -102,22 +102,51 @@ class TaskTracker {
     echo "delete command \n";
   }
   public function markInProgress_command($command) {
-    echo "mark-in-progress command \n";
+    if (!isset($command[1])) {
+      echo "task id is required\n";
+      return ;
+    }
+
+    $tasksRaw = $this->getAllTasks();
+    foreach($tasksRaw["tasks"] as &$task) {
+      if ($task["id"] == $command[1]) {
+        $task["status"] = "in progress";
+        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        return ;
+      }
+    }
+
+    echo "task id not found\n";
   }
-  public function listDone_command($command) {
+  public function listDone_command() {
     $this->printTaks("done");
   }
-  public function listTodo_command($command) {
+  public function listTodo_command() {
     $this->printTaks("not done");
   }
-  public function listInProgress_command($command) {
+  public function listInProgress_command() {
     $this->printTaks("in progress");
   }
-  public function list_command($command) {
+  public function list_command() {
     $this->printTaks();
   }
   public function markDone_command($command) {
-    echo "mark done command \n";
+    if (!isset($command[1])) {
+      echo "task id is required\n";
+      return ;
+    }
+
+    $tasksRaw = $this->getAllTasks();
+    foreach($tasksRaw["tasks"] as &$task) {
+      if ($task["id"] == $command[1]) {
+        $task["status"] = "done";
+        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        return ;
+      }
+    }
+
+
+    echo "task id not found\n";
   }
   public function exit_command($command) {
     echo "exit command \n";
@@ -144,20 +173,20 @@ class TaskTracker {
         if (isset($command[1])) {
           switch($command[1]) {
             case "done":
-              $this->listDone_command($command);
+              $this->listDone_command();
               break;
             case "todo":
-              $this->listTodo_command($command);
+              $this->listTodo_command();
               break;
             case "in-progress":
-              $this->listInProgress_command($command);
+              $this->listInProgress_command();
               break;
             default:
               echo "$command[1] is invalid argument\n";
               return ;
           }
         } else {
-          $this->list_command($command);
+          $this->list_command();
         }
         break;
       case "exit":
