@@ -2,11 +2,6 @@
     "lastId": 4,
     "tasks": [
         {
-            "id": 1,
-            "task": "Makiesse",
-            "status": "done"
-        },
-        {
             "id": 2,
             "task": "Makiesse Morais",
             "status": "done"
@@ -15,11 +10,6 @@
             "id": 3,
             "task": "Other Makiesse Morais",
             "status": "in progress"
-        },
-        {
-            "id": 4,
-            "task": "Comer bem todos os dias",
-            "status": "not done"
         }
     ]
 }

@@ -95,7 +95,22 @@ class TaskTracker {
     echo "update command \n";
   }
   public function delete_command($command) {
-    echo "delete command \n";
+    if (!isset($command[1])) {
+      echo "task id is required\n";
+      return ;
+    }
+
+    $data = $this->getAllTasks();
+    foreach($data["tasks"] as $index => $task) {
+      if ($task["id"] == $command[1]){
+        unset($data["tasks"][$index]);
+        $data["tasks"] = array_values($data["tasks"]);
+        file_put_contents("db.json", json_encode($data, JSON_PRETTY_PRINT));
+        break;
+      }
+    }
+
+    echo "Success!\n";
   }
   public function markInProgress_command($command) {
     if (!isset($command[1])) {
