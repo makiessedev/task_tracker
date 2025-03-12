@@ -10,10 +10,6 @@ class TaskTracker {
     while (1) {
       $line = readline($this->prompt);
 
-      // temp
-      if ($line === "exit")
-        exit(0);
-      //
       if ($line) {
         $line = trim($line);
         readline_add_history($line);
@@ -148,8 +144,9 @@ class TaskTracker {
 
     echo "task id not found\n";
   }
-  public function exit_command($command) {
-    echo "exit command \n";
+
+  public function exit_command() {
+    exit(0);
   }
 
   private function process_command($command) {
@@ -190,7 +187,7 @@ class TaskTracker {
         }
         break;
       case "exit":
-        $this->exit_command($command);
+        $this->exit_command();
         break;
       default:
         echo "command '$command[0]' not found!\n";
