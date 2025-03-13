@@ -93,8 +93,10 @@ class TaskTracker {
   public function add_command($command) {
     $task = $this->get_task($command, 1);
 
-    if (isset($task))
+    if (isset($task)){
       $this->addTask($task);
+      echo "Task added successfully (ID: " . $this->getAllTasks()["lastId"] . ")\n";
+    }
   }
   public function update_command($command) {
     if (!isset($command[1]) || !isset($command[2])) {
