@@ -4,6 +4,7 @@
 
 class TaskTracker {
   private $prompt = "task-cli ";
+  private $dbName = "db.json";
 
   public function run() {
     $this->initConfigs();
@@ -29,11 +30,11 @@ class TaskTracker {
     array_push($tasks["tasks"], ["id" => $id, "task" => $task, "status" => "not done"]);
     $tasks["lastId"] = $id;
     $content = json_encode($tasks, JSON_PRETTY_PRINT);
-    file_put_contents("db.json", $content);
+    file_put_contents($this->dbName, $content);
   }
 
   private function getAllTasks() {
-    return (json_decode(file_get_contents("db.json"), true));
+    return (json_decode(file_get_contents($this->dbName), true));
   }
 
   private function printTask($task) {
@@ -46,11 +47,20 @@ class TaskTracker {
       if (isset($delimiter))
         $delimiter === $task["status"] ? $this->printTask($task) : null;
       else
-      $this->printTask($task);
+        $this->printTask($task);
     }
   }
 
   private function initConfigs() {
+    $fileStruct = [
+      "lastId" => 0,
+      "tasks" => []
+    ];
+
+    if (!file_exists($this->dbName)) {
+      file_put_contents($this->dbName, json_encode($fileStruct));
+    }
+
     if (!function_exists("pcntl_signal"))
       exit(0);
     pcntl_signal(SIGINT, function() {
@@ -113,7 +123,7 @@ class TaskTracker {
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
         $task["task"] = $newValue;
-        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }
     }
@@ -131,7 +141,7 @@ class TaskTracker {
       if ($task["id"] == $command[1]){
         unset($data["tasks"][$index]);
         $data["tasks"] = array_values($data["tasks"]);
-        file_put_contents("db.json", json_encode($data, JSON_PRETTY_PRINT));
+        file_put_contents($this->dbName, json_encode($data, JSON_PRETTY_PRINT));
         break;
       }
     }
@@ -148,7 +158,7 @@ class TaskTracker {
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
         $task["status"] = "in progress";
-        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }
     }
@@ -177,7 +187,7 @@ class TaskTracker {
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
         $task["status"] = "done";
-        file_put_contents("db.json", json_encode($tasksRaw, JSON_PRETTY_PRINT));
+        file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }
     }
