@@ -27,7 +27,13 @@ class TaskTracker {
     } else {
       $id = (int) ($tasks["lastId"] + 1);
     }
-    array_push($tasks["tasks"], ["id" => $id, "task" => $task, "status" => "not done"]);
+    array_push($tasks["tasks"], [
+      "id" => $id,
+      "description" => $task,
+      "status" => "not done",
+      "createdAt" => date("Y-m-d H:i:s"),
+      "updatedAt" => date("Y-m-d H:i:s")
+    ]);
     $tasks["lastId"] = $id;
     $content = json_encode($tasks, JSON_PRETTY_PRINT);
     file_put_contents($this->dbName, $content);
@@ -38,11 +44,12 @@ class TaskTracker {
   }
 
   private function printTask($task) {
-    echo "[$task[id]] - $task[task] - $task[status]\n";
+    echo "[$task[id]] - $task[description] - $task[status] - $task[createdAt] - $task[updatedAt]\n";
   }
 
   private function printTaks($delimiter = null) {
     $content = $this->getAllTasks();
+    echo "[id] - [description] - [status] - [createdAt] - [updatedAt]\n";
     foreach ($content["tasks"] as $task) {
       if (isset($delimiter))
         $delimiter === $task["status"] ? $this->printTask($task) : null;
@@ -66,6 +73,8 @@ class TaskTracker {
     pcntl_signal(SIGINT, function() {
       echo "\n";
     });
+
+    date_default_timezone_set("Africa/Luanda");
   }
 
   private function get_task($command, $start) {
@@ -122,7 +131,8 @@ class TaskTracker {
     $tasksRaw = $this->getAllTasks();
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
-        $task["task"] = $newValue;
+        $task["description"] = $newValue;
+        $task["updatedAt"] = date("Y-m-d H:i:s");;
         file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }
@@ -158,6 +168,7 @@ class TaskTracker {
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
         $task["status"] = "in progress";
+        $task["updatedAt"] = date("Y-m-d H:i:s");
         file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }
@@ -187,6 +198,7 @@ class TaskTracker {
     foreach($tasksRaw["tasks"] as &$task) {
       if ($task["id"] == $command[1]) {
         $task["status"] = "done";
+        $task["updatedAt"] = date("Y-m-d H:i:s");
         file_put_contents($this->dbName, json_encode($tasksRaw, JSON_PRETTY_PRINT));
         return ;
       }

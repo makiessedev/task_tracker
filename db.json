@@ -1,10 +1,19 @@
 {
-    "lastId": 1,
+    "lastId": 6,
     "tasks": [
         {
-            "id": 1,
-            "task": "Comer Humburguer",
-            "status": "not done"
+            "id": 5,
+            "description": "Lavar muito bem a roupa",
+            "status": "done",
+            "createdAt": "2025-03-13 18:15:38",
+            "updatedAt": "2025-03-13 18:23:29"
+        },
+        {
+            "id": 6,
+            "description": "Comer bem",
+            "status": "not done",
+            "createdAt": "2025-03-13 18:28:18",
+            "updatedAt": "2025-03-13 18:28:18"
         }
     ]
 }
